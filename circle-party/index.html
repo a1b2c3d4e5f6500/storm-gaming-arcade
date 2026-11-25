@@ -32,13 +32,24 @@
     <header class="game-header">
       <div class="brand"><span class="brand-dot"></span> CIRCLE PARTY</div>
       <div class="party-badge">PARTY <strong id="partyCode">------</strong></div>
-      <button id="leaveButton" class="leave-button">Forlad</button>
+      <div class="game-actions">
+        <button id="fullscreenButton" class="fullscreen-button" type="button">Fuld skærm</button>
+        <button id="leaveButton" class="leave-button">Forlad</button>
+      </div>
     </header>
     <canvas id="gameCanvas"></canvas>
     <aside class="stats">
       <span>STØRRELSE</span><strong id="sizeValue">18</strong>
       <span>SCORE</span><strong id="scoreValue">0</strong>
     </aside>
+    <div id="joystick" class="joystick" aria-label="Bevægelsesjoystick">
+      <div id="joystickKnob" class="joystick-knob"></div>
+    </div>
+    <div id="orientationNotice" class="orientation-notice" role="status">
+      <div class="phone-icon">▱</div>
+      <strong>Hold din telefon vandret</strong>
+      <span>Spillet fungerer bedst i liggende retning</span>
+    </div>
   </main>
 
   <script src="https://unpkg.com/peerjs@1.5.5/dist/peerjs.min.js"></script>

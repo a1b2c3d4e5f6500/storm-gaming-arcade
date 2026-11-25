@@ -11,6 +11,9 @@ const lobbyStatus = document.querySelector('#lobbyStatus');
 const partyCode = document.querySelector('#partyCode');
 const sizeValue = document.querySelector('#sizeValue');
 const scoreValue = document.querySelector('#scoreValue');
+const fullscreenButton = document.querySelector('#fullscreenButton');
+const joystick = document.querySelector('#joystick');
+const joystickKnob = document.querySelector('#joystickKnob');
 
 const WORLD_WIDTH = 5000;
 const WORLD_HEIGHT = 3200;
@@ -25,6 +28,7 @@ let activeCode = null;
 let isHost = false;
 let worldStarted = false;
 const keys = { up:false, down:false, left:false, right:false };
+const isMobile = navigator.maxTouchPoints > 0 || window.matchMedia('(hover: none) and (pointer: coarse)').matches;
 
 function randomCode() {
   const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
@@ -50,6 +54,7 @@ function enterGame(code) {
   partyCode.textContent = code;
   lobby.hidden = true;
   gameScreen.hidden = false;
+  if (isMobile) document.body.classList.add('mobile-game');
   resizeCanvas();
 }
 
@@ -141,6 +146,62 @@ createButton.addEventListener('click', startHost);
 joinButton.addEventListener('click', joinParty);
 leaveButton.addEventListener('click', () => window.location.reload());
 codeInput.addEventListener('input', () => codeInput.value = codeInput.value.replace(/[^a-z0-9]/gi,'').toUpperCase());
+
+async function toggleFullscreen() {
+  try {
+    if (!document.fullscreenElement) {
+      await gameScreen.requestFullscreen();
+      if (screen.orientation?.lock) {
+        try { await screen.orientation.lock('landscape'); } catch (_) {}
+      }
+    } else {
+      await document.exitFullscreen();
+    }
+  } catch (_) {
+    lobbyStatus.textContent = 'Fuld skærm blev ikke tilladt af browseren.';
+  }
+}
+
+fullscreenButton.addEventListener('click', toggleFullscreen);
+document.addEventListener('fullscreenchange', () => {
+  fullscreenButton.textContent = document.fullscreenElement ? 'Forlad fuld skærm' : 'Fuld skærm';
+  resizeCanvas();
+});
+
+function updateJoystick(event) {
+  const rect = joystick.getBoundingClientRect();
+  let dx = event.clientX - (rect.left + rect.width / 2);
+  let dy = event.clientY - (rect.top + rect.height / 2);
+  const length = Math.hypot(dx, dy);
+  const maxDistance = 38;
+  if (length > maxDistance) {
+    dx = dx / length * maxDistance;
+    dy = dy / length * maxDistance;
+  }
+  joystickKnob.style.transform = `translate(${dx}px, ${dy}px)`;
+  const deadZone = 10;
+  keys.left = dx < -deadZone;
+  keys.right = dx > deadZone;
+  keys.up = dy < -deadZone;
+  keys.down = dy > deadZone;
+}
+
+function releaseJoystick() {
+  joystickKnob.style.transform = 'translate(0, 0)';
+  keys.up = keys.down = keys.left = keys.right = false;
+}
+
+if (isMobile) {
+  joystick.addEventListener('pointerdown', event => {
+    joystick.setPointerCapture(event.pointerId);
+    updateJoystick(event);
+  });
+  joystick.addEventListener('pointermove', event => {
+    if (joystick.hasPointerCapture(event.pointerId)) updateJoystick(event);
+  });
+  joystick.addEventListener('pointerup', releaseJoystick);
+  joystick.addEventListener('pointercancel', releaseJoystick);
+}
 
 function distance(a,b) { return Math.hypot(a.x-b.x,a.y-b.y); }
 function clamp(value,min,max) { return Math.min(Math.max(value,min),max); }
