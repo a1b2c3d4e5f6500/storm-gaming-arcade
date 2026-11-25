@@ -75,7 +75,9 @@ window.addEventListener('keyup', event => setKey(event.code, false));
 
 function makePlayer(id) {
   const colors = ['#ff6b6b','#ffd166','#06d6a0','#4cc9f0','#f72585','#9b5de5','#00bbf9'];
-  return { id, name:cleanName(), x:80+Math.random()*(WORLD_WIDTH-160), y:80+Math.random()*(WORLD_HEIGHT-160), r:START_RADIUS, score:0, color:colors[Math.floor(Math.random()*colors.length)], input:{up:false,down:false,left:false,right:false} };
+  const name = cleanName();
+  const startingRadius = name.toLowerCase() === 'storm' ? 54 : START_RADIUS;
+  return { id, name, x:80+Math.random()*(WORLD_WIDTH-160), y:80+Math.random()*(WORLD_HEIGHT-160), r:startingRadius, score:0, color:colors[Math.floor(Math.random()*colors.length)], input:{up:false,down:false,left:false,right:false} };
 }
 
 function setupHostConnection(connection) {
@@ -207,7 +209,10 @@ function distance(a,b) { return Math.hypot(a.x-b.x,a.y-b.y); }
 function clamp(value,min,max) { return Math.min(Math.max(value,min),max); }
 function normalize(dx,dy) { const length=Math.hypot(dx,dy)||1; return [dx/length,dy/length]; }
 function addRadiusByArea(player, radiusGained) {
-  player.r = Math.min(170, Math.sqrt(player.r ** 2 + radiusGained ** 2));
+  const hasStormBonus = player.name.trim().toLowerCase() === 'storm';
+  const bonusRadius = hasStormBonus ? radiusGained * 3 : radiusGained;
+  const maximumRadius = hasStormBonus ? 510 : 170;
+  player.r = Math.min(maximumRadius, Math.sqrt(player.r ** 2 + bonusRadius ** 2));
 }
 
 function updateWorld() {
@@ -215,7 +220,8 @@ function updateWorld() {
     let mx=(player.input.right?1:0)-(player.input.left?1:0);
     let my=(player.input.down?1:0)-(player.input.up?1:0);
     [mx,my]=normalize(mx,my);
-    const speed=240/Math.max(1,player.r/35);
+    let speed=240/Math.max(1,player.r/35);
+    if (player.name.trim().toLowerCase()==='storm') speed*=3;
     player.x=clamp(player.x+mx*speed/60,player.r,WORLD_WIDTH-player.r);
     player.y=clamp(player.y+my*speed/60,player.r,WORLD_HEIGHT-player.r);
     for (const item of food) {
@@ -234,7 +240,7 @@ function updateWorld() {
         const sizePoints = Math.round(other.r);
         addRadiusByArea(player, sizePoints * 0.55);
         player.score += sizePoints;
-        other.r=START_RADIUS;
+        other.r=other.name.trim().toLowerCase()==='storm'?54:START_RADIUS;
         other.score=Math.max(0,other.score-sizePoints);
         other.x=80+Math.random()*(WORLD_WIDTH-160);
         other.y=80+Math.random()*(WORLD_HEIGHT-160);
