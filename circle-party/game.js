@@ -145,6 +145,9 @@ codeInput.addEventListener('input', () => codeInput.value = codeInput.value.repl
 function distance(a,b) { return Math.hypot(a.x-b.x,a.y-b.y); }
 function clamp(value,min,max) { return Math.min(Math.max(value,min),max); }
 function normalize(dx,dy) { const length=Math.hypot(dx,dy)||1; return [dx/length,dy/length]; }
+function addRadiusByArea(player, radiusGained) {
+  player.r = Math.min(170, Math.sqrt(player.r ** 2 + radiusGained ** 2));
+}
 
 function updateWorld() {
   for (const player of players.values()) {
@@ -156,7 +159,7 @@ function updateWorld() {
     player.y=clamp(player.y+my*speed/60,player.r,WORLD_HEIGHT-player.r);
     for (const item of food) {
       if (distance(player,item)<player.r+item.r+2) {
-        player.r=Math.min(135,player.r+.35);
+        addRadiusByArea(player, item.r * 0.18);
         player.score++;
         Object.assign(item,makeFood());
         break;
@@ -166,8 +169,8 @@ function updateWorld() {
   for (const player of players.values()) {
     for (const other of players.values()) {
       if (player.id===other.id) continue;
-      if (distance(player,other)<player.r+other.r-4 && player.r>other.r*1.12) {
-        player.r=Math.min(170,player.r+other.r*.16);
+      if (distance(player,other)<player.r+other.r-2 && player.r>other.r*1.05) {
+        addRadiusByArea(player, other.r * 0.55);
         player.score+=5;
         other.r=START_RADIUS;
         other.score=Math.max(0,other.score-5);
