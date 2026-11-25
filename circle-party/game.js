@@ -231,10 +231,11 @@ function updateWorld() {
     for (const other of players.values()) {
       if (player.id===other.id) continue;
       if (distance(player,other)<player.r+other.r-2 && player.r>other.r*1.05) {
-        addRadiusByArea(player, other.r * 0.55);
-        player.score+=5;
+        const sizePoints = Math.round(other.r);
+        addRadiusByArea(player, sizePoints * 0.55);
+        player.score += sizePoints;
         other.r=START_RADIUS;
-        other.score=Math.max(0,other.score-5);
+        other.score=Math.max(0,other.score-sizePoints);
         other.x=80+Math.random()*(WORLD_WIDTH-160);
         other.y=80+Math.random()*(WORLD_HEIGHT-160);
       }
