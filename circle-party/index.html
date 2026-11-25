@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="da">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Circle Party</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <main id="lobby" class="lobby">
+    <section class="brand-panel">
+      <div class="brand"><span class="brand-dot"></span> CIRCLE PARTY</div>
+      <h1>Spis.<br><span>Bliv større.</span></h1>
+      <p>Indsaml mad, undgå større spillere — og jag dem, der er mindre end dig.</p>
+    </section>
+    <section class="party-card">
+      <label for="nameInput">DIT NAVN</label>
+      <input id="nameInput" maxlength="18" value="Spiller" autocomplete="nickname">
+      <div class="divider"><span>ÅBN ET NYT PARTY</span></div>
+      <button id="createButton" class="primary-button">Opret party <span>→</span></button>
+      <div class="divider"><span>ELLER TILSLUT DIG</span></div>
+      <div class="code-row">
+        <input id="codeInput" maxlength="6" placeholder="PARTY KODE" autocomplete="off">
+        <button id="joinButton" class="join-button">Deltag</button>
+      </div>
+      <p id="lobbyStatus" class="lobby-status">Klar til at spille online</p>
+      <a class="back-link" href="../">← Til Storm Gaming</a>
+    </section>
+  </main>
+
+  <main id="gameScreen" class="game-screen" hidden>
+    <header class="game-header">
+      <div class="brand"><span class="brand-dot"></span> CIRCLE PARTY</div>
+      <div class="party-badge">PARTY <strong id="partyCode">------</strong></div>
+      <button id="leaveButton" class="leave-button">Forlad</button>
+    </header>
+    <canvas id="gameCanvas"></canvas>
+    <aside class="stats">
+      <span>STØRRELSE</span><strong id="sizeValue">18</strong>
+      <span>SCORE</span><strong id="scoreValue">0</strong>
+    </aside>
+  </main>
+
+  <script src="https://unpkg.com/peerjs@1.5.5/dist/peerjs.min.js"></script>
+  <script src="game.js"></script>
+</body>
+</html>
